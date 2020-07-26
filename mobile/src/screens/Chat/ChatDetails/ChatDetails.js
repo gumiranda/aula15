@@ -36,7 +36,9 @@ function ChatDetails({navigation}) {
       dispatch(getRequest({page: 1, id: navigation.getParam('chatId')}));
     }
     getMessages();
-    return () => socket.disconnect();
+    return () => {
+      socket.disconnect();
+    };
   }, []);
   useEffect(() => {
     if (!messagesLoading) {

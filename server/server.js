@@ -83,15 +83,12 @@ server.listen(port, () => {
   io.on('connection', async (socket) => {
     const { token } = socket.handshake.query;
     const decoded = await jwt.verify(token, variables.Security.secretKey);
-    connectedUsers[decoded.user._id] = null;
+    connectedUsers[decoded.user._id] = socket.id;
     console.log(decoded.user._id, 'conectado');
+    socket.on('disconnect', async () => {
+      connectedUsers[decoded.user._id] = null;
+    });
   });
-  io.on('disconnect', async (socket) => {
-    console.log('SOCKET', socket);
-    const { token } = socket.handshake.query;
-    const decoded = await jwt.verify(token, variables.Security.secretKey);
-    connectedUsers[decoded.user._id] = null;
-    console.log(decoded.user._id, 'desconectado');
-  });
+
   console.info(`Servidor rodando na porta ${port}`);
 });
