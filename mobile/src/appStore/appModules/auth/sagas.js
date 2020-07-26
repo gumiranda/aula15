@@ -1,4 +1,4 @@
-import {takeLatest, call, put, all} from 'redux-saga/effects';
+import {takeLatest, call, put, all, select} from 'redux-saga/effects';
 import {Alert} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../../../services/api';
@@ -29,13 +29,15 @@ export function* signUp({payload}) {
       Alert.alert('Erro', 'Você não pode ser o admin');
       yield put(signFailure());
     }
-
+    const {pushId, pushToken} = yield select(state => state.auth);
     const response = yield call(api.post, 'user/register', {
       email,
       senha,
       senhaConfirmacao,
       type,
       nome,
+      pushId,
+      pushToken,
     });
     if (response.status === 201) {
       Alert.alert('Sucesso', 'Cadastro realizado');

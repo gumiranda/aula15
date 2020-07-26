@@ -2,6 +2,7 @@
 /* eslint-disable no-use-before-define */
 require('dotenv').config();
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const variables = require('./bin/configuration/variables');
@@ -79,10 +80,18 @@ app.use('/api/chat', chatRouter);
 const port = process.env.PORT || 3333;
 
 server.listen(port, () => {
-  io.on('connection', (socket) => {
-    const { user_id } = socket.handshake.query;
-    connectedUsers[user_id] = socket.id;
+  io.on('connection', async (socket) => {
+    const { token } = socket.handshake.query;
+    const decoded = await jwt.verify(token, variables.Security.secretKey);
+    connectedUsers[decoded.user._id] = null;
+    console.log(decoded.user._id, 'conectado');
   });
-
+  io.on('disconnect', async (socket) => {
+    console.log('SOCKET', socket);
+    const { token } = socket.handshake.query;
+    const decoded = await jwt.verify(token, variables.Security.secretKey);
+    connectedUsers[decoded.user._id] = null;
+    console.log(decoded.user._id, 'desconectado');
+  });
   console.info(`Servidor rodando na porta ${port}`);
 });

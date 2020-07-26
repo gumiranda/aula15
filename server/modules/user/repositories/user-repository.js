@@ -1,12 +1,11 @@
 require('../models/user-model');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const base = require('../../../bin/base/repository-base');
 
 class userRepository {
   constructor() {
     this._base = new base('User');
-    this._projection = 'nome email payDay type cpf phone';
+    this._projection = 'nome email payDay type cpf phone pushId';
   }
 
   async authenticate(Email, Senha, flag) {
@@ -21,8 +20,8 @@ class userRepository {
     return null;
   }
 
-  async IsEmailExiste(Email) {
-    return await this._base._model.findOne({ email: Email }, this._projection);
+  IsEmailExiste(Email) {
+    return this._base._model.findOne({ email: Email }, this._projection);
   }
 
   async create(data, req) {
@@ -34,9 +33,10 @@ class userRepository {
     return userR;
   }
 
-  async updatePayment(data, userid) {
-    return await this._base.update(userid, { payDay: data });
+  updatePayment(data, userid) {
+    return this._base.update(userid, { payDay: data });
   }
+
   async completeRegister(data, userid) {
     await this._base.update(userid, data);
     const userR = await this._base._model.findOne(
@@ -84,26 +84,31 @@ class userRepository {
     }
   }
 
-  async getAll() {
-    return await this._base._model.find({}, this._projection);
+  getAll() {
+    return this._base._model.find({}, this._projection);
   }
 
-  async getByPage(page) {
+  getPushId(_id) {
+    return this._base._model.findOne({ _id }, 'pushId nome');
+  }
+
+  async getByPage(page, user) {
     const users = await this._base._model
-      .find({ type: 'client' }, this._projection)
+      .find({ type: 'client', _id: { $ne: user } }, this._projection)
       .skip((page - 1) * 10)
       .limit(10)
       .sort({ createdAt: -1 });
     const usersCount = await this._base._model
-      .find({ type: 'client' }, this._projection)
+      .find({ type: 'client', _id: { $ne: user } }, this._projection)
       .count();
     return {
       users,
       usersCount,
     };
   }
-  async delete(id) {
-    return await this._base.delete(id);
+
+  delete(id) {
+    return this._base.delete(id);
   }
 }
 

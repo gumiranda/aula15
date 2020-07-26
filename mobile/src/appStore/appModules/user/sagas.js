@@ -73,9 +73,15 @@ export function* getUsers({payload}) {
         yield put(getSuccess({usersList: users, usersTotal: usersCount}));
       } else {
         const {usersList} = yield select(state => state.user);
+        const joinArray = [...usersList, ...users];
+        const mapa = new Map();
+        for (const x of joinArray) {
+          mapa.set(x._id, x);
+        }
+        const final = [...mapa.values()];
         yield put(
           getSuccess({
-            usersList: [...usersList, ...users],
+            usersList: final,
             usersTotal: usersCount,
           }),
         );

@@ -13,6 +13,7 @@ const userModel = new schema(
     photo_url: { type: String },
     type: { type: String, default: 'client' },
     cpf: { type: String },
+    pushId: { type: String },
     phone: { type: String },
     senha: { type: String },
     ativo: { type: Boolean, required: true, default: true },

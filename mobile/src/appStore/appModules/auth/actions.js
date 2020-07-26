@@ -7,6 +7,9 @@ export function signInSuccess(token, user) {
 export function signUpRequest(data) {
   return {type: '@auth/SIGN_UP_REQUEST', payload: data};
 }
+export function setPushId(payload) {
+  return {type: '@auth/SET_PUSH_ID', payload};
+}
 export function signFailure() {
   return {type: '@auth/SIGN_FAILURE'};
 }

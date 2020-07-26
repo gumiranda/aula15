@@ -1,7 +1,7 @@
 import './src/config/reactotronConfig';
 import React, {useEffect} from 'react';
 import {PersistGate} from 'redux-persist/integration/react';
-import {Provider, useSelector} from 'react-redux';
+import {Provider, useDispatch, useSelector} from 'react-redux';
 import {StatusBar} from 'react-native';
 import {Provider as PaperProvider} from 'react-native-paper';
 import {darken} from 'polished';
@@ -10,11 +10,17 @@ import {appStore, appPersistor} from './src/appStore/appStore';
 import createRouter from './routes';
 import {appColors} from './src/utils/appColors';
 import appConstants from './src/utils/appConstants';
+import {setPushId} from './src/appStore/appModules/auth/actions';
 
 function DevDoido() {
+  const dispatch = useDispatch();
   const signed = useSelector(state => state.auth.signed);
   const Routes = createRouter(signed);
-  const onIds = data => {};
+  const onIds = data => {
+    if (!signed) {
+      dispatch(setPushId({pushId: data.userId, pushToken: data.pushToken}));
+    }
+  };
   useEffect(() => {
     OneSignal.init(appConstants.ONE_SIGNAL_KEY);
     OneSignal.addEventListener('ids', onIds);

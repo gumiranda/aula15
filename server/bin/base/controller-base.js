@@ -57,6 +57,27 @@ exports.getMyAll = async (repository, req, res) => {
     res.status(500).send({ message: 'Erro no processamento', error: erro });
   }
 };
+exports.getMy = async (repository, validationContract, req, res) => {
+  try {
+    if (!validationContract.isValid()) {
+      res
+        .status(400)
+        .send({
+          message: 'Existem dados inválidos na sua requisição',
+          validation: validationContract.errors(),
+        })
+        .end();
+      return;
+    }
+    const resultado = await repository.getMy(
+      req.params.page,
+      req.usuarioLogado.user,
+    );
+    res.status(200).send(resultado);
+  } catch (erro) {
+    res.status(500).send({ message: 'Erro no processamento', error: erro });
+  }
+};
 exports.delete = async (repository, req, res) => {
   try {
     const { id } = req.params;

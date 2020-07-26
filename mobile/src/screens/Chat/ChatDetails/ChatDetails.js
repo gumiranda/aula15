@@ -10,6 +10,7 @@ import api from '../../../services/api';
 import {Title} from './styles';
 import {getRequest, reset} from '../../../appStore/appModules/chat/details';
 import {appColors} from '../../../utils/appColors';
+
 function ChatDetails({navigation}) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -24,16 +25,18 @@ function ChatDetails({navigation}) {
     messagesTotal,
   } = useSelector(state => state.chat);
   const profile = useSelector(state => state.user.profile);
+  const token = useSelector(state => state.auth.token);
   const socket = useMemo(() => {
     return socketio('https://devdoido.herokuapp.com', {
-      query: {user_id: profile._id},
+      query: {token},
     });
-  }, [profile]);
+  }, [token]);
   useEffect(() => {
     async function getMessages() {
       dispatch(getRequest({page: 1, id: navigation.getParam('chatId')}));
     }
     getMessages();
+    return () => socket.disconnect();
   }, []);
   useEffect(() => {
     if (!messagesLoading) {

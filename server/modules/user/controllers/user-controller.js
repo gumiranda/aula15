@@ -4,6 +4,7 @@ const repository = require('../repositories/user-repository');
 const validation = require('../../../bin/helpers/validation');
 const ctrlBase = require('../../../bin/base/controller-base');
 const variables = require('../../../bin/configuration/variables');
+const OneSignal = require('../../../bin/handlers/onesignal');
 
 const _repo = new repository();
 
@@ -37,6 +38,9 @@ userController.prototype.post = async (req, res) => {
     }
     const salt = await bcrypt.genSaltSync(10);
     req.body.senha = await bcrypt.hashSync(req.body.senha, salt);
+    if (req.body.pushToken) {
+      await OneSignal.addDevice(req.body.pushToken);
+    }
     ctrlBase.post(_repo, validationContract, req, res);
   } catch (e) {
     res.status(500).send({ message: 'Internal server error', error: e });
@@ -115,7 +119,7 @@ userController.prototype.getByPage = async (req, res) => {
   const { page } = params;
   validationContract.isRequired(page, 'pageNumber obrigatório');
   try {
-    const resultado = await _repo.getByPage(page);
+    const resultado = await _repo.getByPage(page, req.usuarioLogado.user._id);
     res.status(200).send(resultado);
   } catch (erro) {
     res.status(500).send({ message: 'Erro no processamento', error: erro });

@@ -1,6 +1,11 @@
+const OneSignal = require('../../../bin/handlers/onesignal');
+
 const repository = require('../repositories/chat-repository');
+const repositoryUser = require('../../user/repositories/user-repository');
 
 const _repo = new repository();
+const _repoUser = new repositoryUser();
+
 const ctrlBase = require('../../../bin/base/controller-base');
 const validation = require('../../../bin/helpers/validation');
 
@@ -109,14 +114,28 @@ chatController.prototype.sendMessage = async (req, res) => {
           },
         };
         io.to(userSocket).emit('response', msg);
+      } else {
+        const pushIdUserFor = await _repoUser.getPushId(userid);
+        if (pushIdUserFor !== null) {
+          await OneSignal.sendNotification(pushIdUserFor.pushId, nome, text);
+        }
       }
     }
 
     res.status(202).send(resultado);
   } catch (erro) {
-    res
-      .status(500)
-      .send({ message: 'Erro no processamento', error: erro.toString() });
+    if (erro instanceof OneSignal.HTTPError) {
+      // When status code of HTTP response is not 2xx, HTTPError is thrown.
+      console.log(erro.statusCode);
+      console.log(erro.body);
+      res
+        .status(500)
+        .send({ message: 'Erro no processamento', error: erro.body });
+    } else {
+      res
+        .status(500)
+        .send({ message: 'Erro no processamento', error: erro.toString() });
+    }
   }
 };
 
@@ -148,7 +167,7 @@ chatController.prototype.delete = async (req, res) => {
   ctrlBase.delete(_repo, req, res);
 };
 chatController.prototype.getByIdPaginate = async (req, res) => {
-  let validationContract = new validation();
+  const validationContract = new validation();
   const { page, id } = req.params;
   validationContract.isRequired(page, 'pageNumber obrigatório');
   validationContract.isRequired(id, 'id do chat obrigatório');

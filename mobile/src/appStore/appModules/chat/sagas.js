@@ -14,9 +14,15 @@ export function* getChats({payload}) {
         yield put(getSuccess({chatsList: chats, chatsTotal: chatsCount}));
       } else {
         const {chatsList} = yield select(state => state.chat);
+        const joinArray = [...chatsList, ...chats];
+        const mapa = new Map();
+        for (const x of joinArray) {
+          mapa.set(x._id, x);
+        }
+        const final = [...mapa.values()];
         yield put(
           getSuccess({
-            chatsList: [...chatsList, ...chats],
+            chatsList: final,
             chatsTotal: chatsCount,
           }),
         );
