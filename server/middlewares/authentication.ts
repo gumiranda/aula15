@@ -1,8 +1,13 @@
-const jwt = require('jsonwebtoken');
-const variables = require('../bin/configuration/variables');
-const usuario = require('../modules/user/models/user-model');
+import jwt from 'jsonwebtoken';
+import { variables } from '../bin/configuration/variables';
+import usuario from '../modules/user/models/user-model';
+import { Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export const auth = async (
+  req,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   const authHeader = req.headers.authorization;
   const [, token] = authHeader.split(' ');
   if (token) {

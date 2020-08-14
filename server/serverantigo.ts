@@ -1,27 +1,25 @@
-/* eslint-disable import/order */
-/* eslint-disable no-use-before-define */
 require('dotenv').config();
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const variables = require('./bin/configuration/variables');
-const helmet = require('helmet');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import { variables } from './bin/configuration/variables';
+import helmet from 'helmet';
 
 // EXPRESS BRUTE FORCE
-const ExpressBrute = require('express-brute');
-const MongooseStore = require('express-brute-mongoose');
-const BruteForceSchema = require('express-brute-mongoose/dist/schema');
+import ExpressBrute from 'express-brute';
+import MongooseStore from 'express-brute-mongoose';
+import BruteForceSchema from 'express-brute-mongoose/dist/schema';
 
 //EXPRESS RATE LIMIT
-const rateLimit = require('express-rate-limit');
-const rateLimitStore = require('@lykmapipo/rate-limit-mongoose');
+import rateLimit from 'express-rate-limit';
+import rateLimitStore from '@lykmapipo/rate-limit-mongoose';
 
 // ROTAS
-const userRouter = require('./modules/user/routes/user-router');
-const cardRouter = require('./modules/payment/routes/card-router');
-const chatRouter = require('./modules/chat/routes/chat-router');
-const transactionRouter = require('./modules/payment/routes/transaction-router');
+import userRouter from './modules/user/routes/user-router';
+import cardRouter from './modules/payment/routes/card-router';
+import chatRouter from './modules/chat/routes/chat-router';
+import transactionRouter from './modules/payment/routes/transaction-router';
 
 const app = express();
 const server = require('http').Server(app);
