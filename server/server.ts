@@ -1,12 +1,12 @@
 require('dotenv').config();
 import { MongoHelper } from './bin/helpers/db/mongo/mongo-helper';
 import jwt from 'jsonwebtoken';
-import { variables } from './bin/configuration/variables';
+import variables from './bin/configuration/variables';
 const connectedUsers = {};
-MongoHelper.connectMongoose(process.env.CONNECTION)
+MongoHelper.connectMongoose(process.env.connection)
   .then(async () => {
-    const { app, server, io } = await import('./bin/configuration/app');
-    let port = 3333;
+    const { server, io } = await import('./bin/configuration/app');
+    let port = process.env.PORT || 3333;
     server.listen(port, () => {
       io.on('connection', async (socket) => {
         const { token } = socket.handshake.query;

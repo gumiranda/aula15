@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { variables } from '../bin/configuration/variables';
+import variables from '../bin/configuration/variables';
 import usuario from '../modules/user/models/user-model';
 import { Response, NextFunction } from 'express';
 

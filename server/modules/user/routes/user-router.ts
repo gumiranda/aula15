@@ -10,5 +10,5 @@ export default (router: Router): void => {
   router.get('/user/', auth, _ctrl.get);
   router.get('/user/page/:page', auth, _ctrl.getByPage);
   router.put('/user/:id', auth, _ctrl.put);
-  router.delete('/:id', auth, _ctrl.delete);
+  router.delete('/user/:id', auth, _ctrl.delete);
 };

@@ -3,7 +3,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
-import { variables } from './bin/configuration/variables';
+import variables from './bin/configuration/variables';
 import helmet from 'helmet';
 
 // EXPRESS BRUTE FORCE
