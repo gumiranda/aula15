@@ -1,36 +1,32 @@
-require('../models/user-model');
-const bcrypt = require('bcryptjs');
-const base = require('../../../bin/base/repository-base');
+import '../models/user-model';
+import bcrypt from 'bcryptjs';
+import base from '../../../bin/base/repository-base';
+import { AddAccountModel } from '../models/AddAccountModel';
+import { AccountModel } from '../models/AccountModel';
 
-class userRepository {
+export default class userRepository {
+  private readonly _base: base;
+  private readonly _projection: string;
   constructor() {
     this._base = new base('User');
-    this._projection = 'nome email payDay type cpf phone pushId';
+    this._projection = 'name email payDay type cpf phone pushId';
   }
 
-  async authenticate(Email, Senha, flag) {
-    const user = await this._base._model.findOne({ email: Email });
-    const userR = await this._base._model.findOne(
-      { email: Email },
-      this._projection,
-    );
-    if (await bcrypt.compareSync(Senha, user.senha)) {
+  async authenticate(email, password) {
+    const user: any = await this._base._model.findOne({ email });
+    const userR = await this._base._model.findOne({ email }, this._projection);
+    if (await bcrypt.compareSync(password, user.password)) {
       return userR;
     }
     return null;
   }
 
-  IsEmailExiste(Email) {
+  emailExists(Email) {
     return this._base._model.findOne({ email: Email }, this._projection);
   }
 
-  async create(data, req) {
-    const userCriado = await this._base.create(data);
-    const userR = await this._base._model.findOne(
-      { _id: userCriado._id },
-      this._projection,
-    );
-    return userR;
+  create(modelData: AddAccountModel): Promise<AccountModel> {
+    return this._base.create(modelData, 'accounts');
   }
 
   updatePayment(data, userid) {
@@ -49,35 +45,35 @@ class userRepository {
   async update(id, data, usuarioLogado) {
     if (usuarioLogado._id === id) {
       if (
-        data.oldPassword !== data.senha &&
+        data.oldPassword !== data.password &&
         data.oldPassword &&
-        data.senha !== undefined &&
-        data.senhaConfirmacao !== undefined &&
-        data.senha === data.senhaConfirmacao
+        data.password !== undefined &&
+        data.passwordConfirmation !== undefined &&
+        data.password === data.passwordConfirmation
       ) {
-        const user = await this._base._model.findOne({ _id: id });
-        if (await bcrypt.compareSync(data.oldPassword, user.senha)) {
+        const user: any = await this._base._model.findOne({ _id: id });
+        if (await bcrypt.compareSync(data.oldPassword, user.password)) {
           const salt = await bcrypt.genSaltSync(10);
-          const _hashSenha = await bcrypt.hashSync(data.senha, salt);
-          let { nome } = user;
+          const _hashpassword = await bcrypt.hashSync(data.password, salt);
+          let { name } = user;
           let { email } = user;
           if (data.email) {
             email = data.email;
           }
-          if (data.nome) {
-            nome = data.nome;
+          if (data.name) {
+            name = data.name;
           }
           const usuarioAtualizado = await this._base.update(id, {
-            nome,
+            name,
             email,
-            senha: _hashSenha,
+            password: _hashpassword,
           });
           return this._base._model.findById(
             usuarioAtualizado._id,
             this._projection,
           );
         }
-        return { message: 'Senha inválida' };
+        return { message: 'password inválida' };
       }
     } else {
       return { message: 'Você não tem permissão para editar esse usuário' };
@@ -89,7 +85,7 @@ class userRepository {
   }
 
   getPushId(_id) {
-    return this._base._model.findOne({ _id }, 'pushId nome');
+    return this._base._model.findOne({ _id }, 'pushId name');
   }
 
   async getByPage(page, user) {
@@ -111,5 +107,3 @@ class userRepository {
     return this._base.delete(id);
   }
 }
-
-module.exports = userRepository;

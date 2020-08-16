@@ -1,6 +1,5 @@
-exports.post = async (repository, validationContract, req, res) => {
+const post = async (repository, validationContract, res, modelData) => {
   try {
-    const data = req.body;
     if (!validationContract.isValid()) {
       res
         .status(400)
@@ -11,14 +10,14 @@ exports.post = async (repository, validationContract, req, res) => {
         .end();
       return;
     }
-    const resultado = await repository.create(data, req);
+    const resultado = await repository.create(modelData);
     res.status(201).send(resultado);
   } catch (e) {
     res.status(500).send({ message: 'Internal server error', error: e });
   }
 };
 
-exports.put = async (repository, validationContract, req, res) => {
+const put = async (repository, validationContract, req, res) => {
   try {
     const data = req.body;
     if (!validationContract.isValid()) {
@@ -41,7 +40,7 @@ exports.put = async (repository, validationContract, req, res) => {
     res.status(500).send({ message: 'Internal server error', error: e });
   }
 };
-exports.get = async (repository, req, res) => {
+const get = async (repository, req, res) => {
   try {
     const resultado = await repository.getAll();
     res.status(200).send(resultado);
@@ -49,7 +48,15 @@ exports.get = async (repository, req, res) => {
     res.status(500).send({ message: 'Erro no processamento', error: erro });
   }
 };
-exports.getMyAll = async (repository, req, res) => {
+const getById = async (repository, req, res) => {
+  try {
+    const resultado = await repository.getById(req.params.id);
+    res.status(200).send(resultado);
+  } catch (erro) {
+    res.status(500).send({ message: 'Erro no processamento', error: erro });
+  }
+};
+const getMyAll = async (repository, req, res) => {
   try {
     const resultado = await repository.getMyAll(req.usuarioLogado.user);
     res.status(200).send(resultado);
@@ -57,7 +64,7 @@ exports.getMyAll = async (repository, req, res) => {
     res.status(500).send({ message: 'Erro no processamento', error: erro });
   }
 };
-exports.getMy = async (repository, validationContract, req, res) => {
+const getMy = async (repository, validationContract, req, res) => {
   try {
     if (!validationContract.isValid()) {
       res
@@ -78,7 +85,7 @@ exports.getMy = async (repository, validationContract, req, res) => {
     res.status(500).send({ message: 'Erro no processamento', error: erro });
   }
 };
-exports.delete = async (repository, req, res) => {
+const remove = async (repository, req, res) => {
   try {
     const { id } = req.params;
     if (id) {
@@ -94,4 +101,13 @@ exports.delete = async (repository, req, res) => {
   } catch (e) {
     res.status(500).send({ message: 'Internal server error', error: e });
   }
+};
+export default {
+  post,
+  put,
+  remove,
+  getById,
+  get,
+  getMy,
+  getMyAll,
 };

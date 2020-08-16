@@ -1,10 +1,12 @@
-require('../models/card-model');
-const base = require('../../../bin/base/repository-base');
+import '../models/card-model';
+import base from '../../../bin/base/repository-base';
 
-class cardRepository {
+export default class cardRepository {
+  private readonly _base: base;
+  private readonly _projection: string;
   constructor() {
     this._base = new base('Card');
-    this._projection = 'name cardNumber brand ';
+    this._projection = 'name cardNumber brand';
   }
 
   getMyAll(userId) {
@@ -16,7 +18,7 @@ class cardRepository {
   }
 
   async delete(id, user) {
-    const model = await this._base.getById(id);
+    const model: any = await this._base.getById(id);
     if (model.userId.toString() === user._id) {
       return await this._base.delete(id);
     }

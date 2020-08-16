@@ -8,14 +8,14 @@ const moment = require('moment');
 
 const userModel = new schema(
   {
-    nome: { trim: true, index: true, required: true, type: String },
+    name: { trim: true, index: true, required: true, type: String },
     email: { type: String },
     photo_url: { type: String },
     type: { type: String, default: 'client' },
     cpf: { type: String },
     pushId: { type: String },
     phone: { type: String },
-    senha: { type: String },
+    password: { type: String },
     ativo: { type: Boolean, required: true, default: true },
     payDay: {
       type: Date,

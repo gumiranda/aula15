@@ -32,5 +32,4 @@ chatModel.pre('save', (next) => {
   if (!this.createdAt) this.createdAt = now;
   next();
 });
-
 module.exports = mongoose.model('Chat', chatModel);

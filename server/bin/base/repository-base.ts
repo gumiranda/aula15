@@ -1,17 +1,25 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import { ModelBase } from './ModelBase';
+import { MongoHelper } from '../helpers/db/mongo/mongo-helper';
 
-class baseRepository {
+export default class baseRepository {
+  public _model: any;
+
   constructor(model) {
     this._model = mongoose.model(model);
   }
-
-  async create(data) {
+  async create(modelData: any, nameCollection: string) {
+    const modelCollection = await MongoHelper.getCollection(nameCollection);
+    const result = await modelCollection.insertOne(modelData);
+    return result.ops[0];
+  }
+  async createBackup(data) {
     const modelo = new this._model(data);
     const resultado = await modelo.save();
     return resultado;
   }
 
-  async update(id, data, usuarioLogado) {
+  async update(id, data) {
     await this._model.findByIdAndUpdate(id, { $set: data });
     const resultado = await this._model.findById(id);
     return resultado;
@@ -33,5 +41,3 @@ class baseRepository {
     return await this._model.findById(id);
   }
 }
-
-module.exports = baseRepository;

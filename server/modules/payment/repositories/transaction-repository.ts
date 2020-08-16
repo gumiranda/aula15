@@ -1,7 +1,9 @@
-require('../models/transaction-model');
-const base = require('../../../bin/base/repository-base');
+import '../models/transaction-model';
+import base from '../../../bin/base/repository-base';
 
-class transactionRepository {
+export default class transactionRepository {
+  private readonly _base: base;
+  private readonly _projection: string;
   constructor() {
     this._base = new base('Transaction');
   }
@@ -11,7 +13,7 @@ class transactionRepository {
   }
 
   async delete(id, user) {
-    const model = await this._base.getById(id);
+    const model: any = await this._base.getById(id);
     if (model.userId.toString() === user._id) {
       return await this._base.delete(id);
     }

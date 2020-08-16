@@ -1,13 +1,16 @@
-require('../models/notification-model');
-const base = require('../../../bin/base/repository-base');
-
-class notificationRepository {
+import '../models/notification-model';
+import base from '../../../bin/base/repository-base';
+import { AddNotificationModel } from '../models/AddNotificationModel';
+import { NotificationModel } from '../models/NotificationModel';
+import { ModelBase } from '../../../bin/base/ModelBase';
+export default class notificationRepository {
+  public _base: base;
   constructor() {
     this._base = new base('Notification');
   }
 
-  create(data) {
-    return this._base.create(data);
+  create(modelData: AddNotificationModel): Promise<ModelBase> {
+    return this._base.create(modelData, 'notifications');
   }
 
   update(id, data) {

@@ -1,17 +1,20 @@
-require('../models/chat-model');
-const base = require('../../../bin/base/repository-base');
-
-class chatRepository {
+import '../models/chat-model';
+import base from '../../../bin/base/repository-base';
+import { AddChatModel } from '../models/AddChatModel';
+import { ModelBase } from '../../../bin/base/ModelBase';
+export default class chatRepository {
+  private readonly _base: base;
+  private readonly projection: string;
+  private readonly projection2: string;
   constructor() {
     this._base = new base('Chat');
     this.projection = 'userDest userRemet createdAt lastMessage messages';
     this.projection2 = 'userDest userRemet createdAt lastMessage';
   }
 
-  create(data) {
-    return this._base.create(data);
+  create(modelData: AddChatModel): Promise<ModelBase> {
+    return this._base.create(modelData, 'chats');
   }
-
   sendMessage(_id, text, user) {
     return this._base._model.findOneAndUpdate(
       { _id },
@@ -26,7 +29,7 @@ class chatRepository {
   }
 
   async deleteMessage(idChat, idMessage, user) {
-    const verifica = await this._base._model.findById(idChat).findOne({
+    const verifica: any = await this._base._model.findById(idChat).findOne({
       messages: { $elemMatch: { _id: idMessage, user } },
     });
     if (verifica.length === 0) {
@@ -65,8 +68,8 @@ class chatRepository {
         },
         this.projection2,
       )
-      .populate({ path: 'userDest', select: 'nome photo_url' })
-      .populate({ path: 'userRemet', select: 'nome photo_url' })
+      .populate({ path: 'userDest', select: 'name photo_url' })
+      .populate({ path: 'userRemet', select: 'name photo_url' })
       .skip((page - 1) * 10)
       .limit(10)
       .sort({ createdAt: -1 });
@@ -83,19 +86,21 @@ class chatRepository {
   }
 
   async verifyChat(userDest, userRemet) {
-    const chat = await this._base._model.findOne(
-      {
-        $or: [
-          {
-            $and: [{ userDest }, { userRemet }],
-          },
-          {
-            $and: [{ userRemet: userDest }, { userDest: userRemet }],
-          },
-        ],
-      },
-      this.projection2,
-    ).lean();
+    const chat = await this._base._model
+      .findOne(
+        {
+          $or: [
+            {
+              $and: [{ userDest }, { userRemet }],
+            },
+            {
+              $and: [{ userRemet: userDest }, { userDest: userRemet }],
+            },
+          ],
+        },
+        this.projection2,
+      )
+      .lean();
     if (chat !== null) {
       return chat;
     }
@@ -106,7 +111,7 @@ class chatRepository {
     const position = page * -20;
     const array = await this._base._model
       .findOne({ _id: id }, { messages: { $slice: [position, 20] } })
-      .populate({ path: 'messages.user', select: 'nome photo_url' });
+      .populate({ path: 'messages.user', select: 'name photo_url' });
     return array;
   }
 

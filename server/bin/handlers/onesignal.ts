@@ -1,5 +1,5 @@
-const axios = require('axios');
-const variables = require('../configuration/variables');
+import axios from 'axios';
+import variables from '../configuration/variables';
 
 const sendNotification = async (appId, name, text) => {
   try {
@@ -45,8 +45,7 @@ const addDevice = async (pushToken) => {
     console.log(e);
   }
 };
-const OneSignal = {
+export default {
   sendNotification,
   addDevice,
 };
-module.exports = OneSignal;
